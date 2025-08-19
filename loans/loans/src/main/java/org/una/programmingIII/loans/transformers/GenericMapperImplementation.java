@@ -1,26 +1,18 @@
 package org.una.programmingIII.loans.transformers;
 
 import org.modelmapper.ModelMapper;
+import java.util.List;
 
 public class GenericMapperImplementation<E, D> implements GenericMapper<E, D> {
+    private final ModelMapper mapper;
+    private final Class<E> entityClass;
+    private final Class<D> dtoClass;
 
-   private final Class<E> entityClass;
-   private final Class<D> dtoClass;
-   private final ModelMapper modelMapper;
+    public GenericMapperImplementation(ModelMapper mapper, Class<E> entityClass, Class<D> dtoClass) {
+        this.mapper = mapper; this.entityClass = entityClass; this.dtoClass = dtoClass;
+    }
 
-   public GenericMapperImplementation(Class<E> entityClass, Class<D> dtoClass, ModelMapper modelMapper) {
-       this.entityClass = entityClass;
-       this.dtoClass = dtoClass;
-       this.modelMapper = modelMapper;
-   }
-
-   @Override
-   public D convertToDTO(E entity) {
-       return modelMapper.map(entity, dtoClass);
-   }
-
-   @Override
-   public E convertToEntity(D dto) {
-       return modelMapper.map(dto, entityClass);
-   }
+    @Override public D toDTO(E entity)   { return mapper.map(entity, dtoClass); }
+    @Override public E toEntity(D dto)   { return mapper.map(dto, entityClass); }
+    @Override public List<D> toDTOList(List<E> entities) { return entities.stream().map(this::toDTO).toList(); }
 }
