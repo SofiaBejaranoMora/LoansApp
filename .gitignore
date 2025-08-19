@@ -1,0 +1,18 @@
+# === Build ===
+target/
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.iml
+
+# === SO / basura ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+
+# === Config local (no compartir) ===
+.env
+src/main/resources/application-local.properties
