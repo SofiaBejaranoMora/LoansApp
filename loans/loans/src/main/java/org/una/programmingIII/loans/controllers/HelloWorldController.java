@@ -1,4 +1,4 @@
-package org.una.programmingIII.loans.controller;
+package org.una.programmingIII.loans.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
