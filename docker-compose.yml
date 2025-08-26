@@ -2,7 +2,7 @@ services:
   db-service:
     build: ./db-service
     container_name: mysql_db
-    restart: always
+    restart: no
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: loans_MySQL
