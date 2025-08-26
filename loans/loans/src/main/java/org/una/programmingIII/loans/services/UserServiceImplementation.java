@@ -1,6 +1,7 @@
 package org.una.programmingIII.loans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.una.programmingIII.loans.dtos.ClientDTO;
 import org.una.programmingIII.loans.dtos.UserDTO;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImplementation implements UserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
    @Autowired
    private UserRepository userRepository;
@@ -39,10 +43,15 @@ public class UserServiceImplementation implements UserService {
    }
    @Override
    public UserDTO createUser(UserDTO userDTO) {
-       GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
-       User user = userMapper.convertToEntity(userDTO);
-       User savedUser = userRepository.save(user);
-       return userMapper.convertToDTO(savedUser);
+    GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+    User user = userMapper.convertToEntity(userDTO);
+
+    if(user.getPassword() != null && !user.getPassword().isEmpty()) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    }
+
+    User savedUser = userRepository.save(user);
+    return userMapper.convertToDTO(savedUser);
    }
 
    @Override
