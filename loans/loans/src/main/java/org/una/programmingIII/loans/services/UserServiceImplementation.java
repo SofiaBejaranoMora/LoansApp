@@ -3,13 +3,16 @@ package org.una.programmingIII.loans.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.una.programmingIII.loans.dtos.ClientDTO;
 import org.una.programmingIII.loans.dtos.UserDTO;
-import org.una.programmingIII.loans.models.Client;
 import org.una.programmingIII.loans.models.User;
 import org.una.programmingIII.loans.repositories.UserRepository;
 import org.una.programmingIII.loans.transformers.GenericMapper;
 import org.una.programmingIII.loans.transformers.GenericMapperFactory;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+
 
 import java.util.List;
 import java.util.Optional;
@@ -24,16 +27,17 @@ public class UserServiceImplementation implements UserService {
    @Autowired
    private UserRepository userRepository;
 
-   @Autowired
-   private GenericMapperFactory mapperFactory;
 
-   @Override
-   public List<UserDTO> getAllUsers() {
-       GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
-       return userRepository.findAll().stream()
-               .map(userMapper::convertToDTO)
-               .collect(Collectors.toList());
-   }
+    @Autowired
+    private GenericMapperFactory mapperFactory;
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+        return userRepository.findAll().stream()
+                .map(userMapper::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
    @Override
    public Optional<UserDTO> getUserByEmail(String email) {
@@ -54,21 +58,30 @@ public class UserServiceImplementation implements UserService {
     return userMapper.convertToDTO(savedUser);
    }
 
-   @Override
-   public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
-       GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
-       return userRepository.findById(id)
-               .map(existingUser -> {
-                   User updatedUser = userMapper.convertToEntity(userDTO);
-                   updatedUser.setId(id);
-                   updatedUser.setCreatedAt(existingUser.getCreatedAt());
-                   User savedUser = userRepository.save(updatedUser);
-                   return userMapper.convertToDTO(savedUser);
-               });
-   }
+    @Override
+    public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
+        GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    User updatedUser = userMapper.convertToEntity(userDTO);
+                    updatedUser.setId(id);
+                    updatedUser.setCreatedAt(existingUser.getCreatedAt());
+                    User savedUser = userRepository.save(updatedUser);
+                    return userMapper.convertToDTO(savedUser);
+                });
+    }
 
-   @Override
-   public void deleteUser(Long id) {
-       userRepository.deleteById(id);
-   }
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<UserDTO> getUsersPage(Pageable pageable) {
+        GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+        return userRepository.findAll(pageable)
+                .map(userMapper::convertToDTO);
+    }
+
+    
 }

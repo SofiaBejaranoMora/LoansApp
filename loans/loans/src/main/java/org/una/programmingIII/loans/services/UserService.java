@@ -2,6 +2,9 @@ package org.una.programmingIII.loans.services;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.una.programmingIII.loans.dtos.UserDTO;
 
 public interface UserService {
@@ -10,4 +13,5 @@ public interface UserService {
    UserDTO createUser(UserDTO userDTO);
    Optional<UserDTO> updateUser(Long id, UserDTO userDTO);
    void deleteUser(Long id);
+   Page<UserDTO> getUsersPage(Pageable pageable);
 }
