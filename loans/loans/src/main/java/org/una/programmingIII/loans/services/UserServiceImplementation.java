@@ -1,6 +1,7 @@
 package org.una.programmingIII.loans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.una.programmingIII.loans.dtos.UserDTO;
 import org.una.programmingIII.loans.models.User;
@@ -21,7 +22,11 @@ import java.util.stream.Collectors;
 public class UserServiceImplementation implements UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+
+   @Autowired
+   private UserRepository userRepository;
+
 
     @Autowired
     private GenericMapperFactory mapperFactory;
@@ -34,20 +39,24 @@ public class UserServiceImplementation implements UserService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<UserDTO> getUserByEmail(String email) {
-        GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
-        return Optional.ofNullable(userRepository.findByEmail(email))
-                .map(userMapper::convertToDTO);
+   @Override
+   public Optional<UserDTO> getUserByEmail(String email) {
+       GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+       return Optional.ofNullable(userRepository.findByEmail(email))
+               .map(userMapper::convertToDTO);
+   }
+   @Override
+   public UserDTO createUser(UserDTO userDTO) {
+    GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
+    User user = userMapper.convertToEntity(userDTO);
+
+    if(user.getPassword() != null && !user.getPassword().isEmpty()) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
-    @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        GenericMapper<User, UserDTO> userMapper = mapperFactory.createMapper(User.class, UserDTO.class);
-        User user = userMapper.convertToEntity(userDTO);
-        User savedUser = userRepository.save(user);
-        return userMapper.convertToDTO(savedUser);
-    }
+    User savedUser = userRepository.save(user);
+    return userMapper.convertToDTO(savedUser);
+   }
 
     @Override
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
